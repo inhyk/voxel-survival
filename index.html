@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voxel Survival</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <canvas id="game" aria-label="생존 기능이 포함된 3D 복셀 게임"></canvas>
+
+      <div class="hud">
+        <div class="hud__top">
+          <section class="stats">
+            <div class="stats__row">
+              <span class="stats__label">체력</span>
+              <div class="meter">
+                <div class="meter__fill meter__fill--health" id="health-fill"></div>
+              </div>
+              <span class="stats__value" id="health-label">10 / 10</span>
+            </div>
+
+            <div class="stats__row">
+              <span class="stats__label">허기</span>
+              <div class="meter">
+                <div class="meter__fill meter__fill--hunger" id="hunger-fill"></div>
+              </div>
+              <span class="stats__value" id="hunger-label">10 / 10</span>
+            </div>
+          </section>
+
+          <div class="hud__day" id="day-label">1일차</div>
+        </div>
+
+        <div class="hud__status" id="status-label">클릭해서 시작</div>
+        <div class="hud__bottom-left" id="hud-bottom-left">
+          <div class="hud__sound" id="sound-label">최근 소리: 없음</div>
+          <div class="hud__hint" id="hud-hint">H 조작법 · O 설정 · M 음악 켜기/끄기 · ESC 마우스 해제</div>
+        </div>
+
+        <section class="controls-panel" id="controls-panel" aria-label="조작법">
+          <h2 class="controls-panel__title">조작법</h2>
+          <div class="controls-panel__grid">
+            <div class="controls-item">
+              <span class="controls-item__key">클릭</span>
+              <span class="controls-item__desc">게임 시작 / 마우스 고정</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">마우스</span>
+              <span class="controls-item__desc">시점 이동</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">W A S D</span>
+              <span class="controls-item__desc">이동</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">Shift</span>
+              <span class="controls-item__desc">달리기</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">Space</span>
+              <span class="controls-item__desc">점프</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">작대기 위</span>
+              <span class="controls-item__desc">W / Space 상승 · S / Shift 하강</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">좌클릭 유지</span>
+              <span class="controls-item__desc">블록 채굴 / 동물 공격</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">우클릭</span>
+              <span class="controls-item__desc">블록 설치 / 음식 먹기</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">1 - 7</span>
+              <span class="controls-item__desc">핫바 슬롯 선택</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">I</span>
+              <span class="controls-item__desc">인벤토리 열기 / 닫기</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">H</span>
+              <span class="controls-item__desc">조작법 표시 / 숨김</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">O</span>
+              <span class="controls-item__desc">설정 열기 / 닫기</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">R</span>
+              <span class="controls-item__desc">사망 후 부활</span>
+            </div>
+            <div class="controls-item">
+              <span class="controls-item__key">ESC</span>
+              <span class="controls-item__desc">마우스 고정 해제</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="crosshair" aria-hidden="true"></div>
+        <div class="action-meter is-hidden" id="action-meter" aria-hidden="true">
+          <div class="action-meter__label" id="action-label">채굴 중</div>
+          <div class="action-meter__track">
+            <div class="action-meter__fill" id="action-fill"></div>
+          </div>
+        </div>
+        <div class="hotbar" id="hotbar"></div>
+
+        <section class="inventory-panel is-hidden" id="inventory-panel" aria-hidden="true">
+          <h2 class="inventory-panel__title">인벤토리 / 제작</h2>
+          <div class="inventory-section">
+            <h3 class="inventory-panel__subtitle">소지품</h3>
+            <div class="inventory-grid" id="inventory-grid"></div>
+          </div>
+          <div class="inventory-section">
+            <h3 class="inventory-panel__subtitle">제작</h3>
+            <div class="craft-grid" id="craft-grid"></div>
+          </div>
+          <p class="inventory-panel__note">
+            소지품을 클릭하면 현재 선택한 핫바 슬롯에 장착됩니다. 도구는 채굴 속도와 공격 사거리에 영향을 주고, 음식과 붕대는 장착 후 우클릭으로 사용합니다.
+          </p>
+        </section>
+
+        <section class="settings-panel is-hidden" id="settings-panel" aria-hidden="true">
+          <h2 class="settings-panel__title">설정</h2>
+          <div class="settings-grid">
+            <label class="settings-field" for="settings-music">
+              <span class="settings-field__label">음악 볼륨</span>
+              <input id="settings-music" type="range" min="0" max="100" step="1" />
+              <span class="settings-field__value" id="settings-music-value">100%</span>
+            </label>
+            <label class="settings-field" for="settings-sfx">
+              <span class="settings-field__label">효과음 볼륨</span>
+              <input id="settings-sfx" type="range" min="0" max="100" step="1" />
+              <span class="settings-field__value" id="settings-sfx-value">100%</span>
+            </label>
+            <label class="settings-field" for="settings-sensitivity">
+              <span class="settings-field__label">마우스 감도</span>
+              <input id="settings-sensitivity" type="range" min="50" max="180" step="5" />
+              <span class="settings-field__value" id="settings-sensitivity-value">100%</span>
+            </label>
+            <label class="settings-field" for="settings-scale">
+              <span class="settings-field__label">화면 해상도 비율</span>
+              <input id="settings-scale" type="range" min="40" max="80" step="2" />
+              <span class="settings-field__value" id="settings-scale-value">56%</span>
+            </label>
+          </div>
+          <div class="settings-toggles">
+            <label class="settings-toggle" for="settings-show-hints">
+              <input id="settings-show-hints" type="checkbox" />
+              <span>하단 안내 표시</span>
+            </label>
+            <label class="settings-toggle" for="settings-show-sound">
+              <input id="settings-show-sound" type="checkbox" />
+              <span>최근 소리 표시</span>
+            </label>
+          </div>
+          <p class="settings-panel__note">
+            O 키로 닫을 수 있습니다. 해상도 비율과 오디오는 바로 적용됩니다.
+          </p>
+        </section>
+
+        <section class="death-screen is-hidden" id="death-screen" aria-hidden="true">
+          <p class="death-screen__title">사망</p>
+          <p class="death-screen__body" id="death-message">슬라임에게 당했다</p>
+          <p class="death-screen__hint">R 키로 다시 시작</p>
+        </section>
+      </div>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
