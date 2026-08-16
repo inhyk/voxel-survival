@@ -1,0 +1,11 @@
+{
+  "slug": "voxel-survival",
+  "title": "Voxel Survival",
+  "description": "체력과 배고픔을 관리하며 하루하루 버티는 복셀 생존기",
+  "longDescription": "블록으로 이루어진 세계에서 살아남는 생존 게임입니다. 체력과 배고픔 게이지를 관리하면서 자원을 모으고, 하루하루 날짜를 넘기며 더 오래 버티는 것이 목표입니다. 3D 라이브러리를 쓰지 않고 Canvas 2D만으로 입체감 있는 복셀 화면을 직접 그려 만들었습니다.",
+  "emoji": "🧱",
+  "techStack": ["JavaScript", "Canvas", "HTML"],
+  "category": "샌드박스",
+  "createdAt": "2026-04",
+  "featured": false
+}
